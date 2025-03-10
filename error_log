@@ -1,0 +1,40 @@
+[10-Mar-2025 13:10:38 UTC] PHP Warning:  Array to string conversion in /home/lp889/public_html/ci527/assignment2/api.php on line 12
+[10-Mar-2025 13:11:54 UTC] PHP Warning:  Undefined array key 0 in /home/lp889/public_html/ci527/assignment2/api.php on line 13
+[10-Mar-2025 13:11:54 UTC] PHP Warning:  Undefined array key 1 in /home/lp889/public_html/ci527/assignment2/api.php on line 13
+[10-Mar-2025 13:11:54 UTC] PHP Warning:  Undefined array key 2 in /home/lp889/public_html/ci527/assignment2/api.php on line 13
+[10-Mar-2025 13:11:54 UTC] PHP Warning:  Undefined array key 3 in /home/lp889/public_html/ci527/assignment2/api.php on line 13
+[10-Mar-2025 13:11:54 UTC] PHP Warning:  Undefined array key 4 in /home/lp889/public_html/ci527/assignment2/api.php on line 13
+[10-Mar-2025 13:11:54 UTC] PHP Warning:  Undefined array key 5 in /home/lp889/public_html/ci527/assignment2/api.php on line 13
+[10-Mar-2025 13:11:54 UTC] PHP Warning:  Undefined array key 6 in /home/lp889/public_html/ci527/assignment2/api.php on line 13
+[10-Mar-2025 13:11:54 UTC] PHP Warning:  Undefined array key 7 in /home/lp889/public_html/ci527/assignment2/api.php on line 13
+[10-Mar-2025 13:11:54 UTC] PHP Warning:  Undefined array key 8 in /home/lp889/public_html/ci527/assignment2/api.php on line 13
+[10-Mar-2025 13:27:22 UTC] PHP Warning:  preg_match(): No ending delimiter '^' found in /home/lp889/public_html/ci527/assignment2/api.php on line 41
+[10-Mar-2025 13:27:22 UTC] PHP Warning:  preg_match(): No ending delimiter '^' found in /home/lp889/public_html/ci527/assignment2/api.php on line 42
+[10-Mar-2025 13:28:09 UTC] PHP Warning:  preg_match(): No ending delimiter '^' found in /home/lp889/public_html/ci527/assignment2/api.php on line 43
+[10-Mar-2025 13:28:09 UTC] PHP Warning:  preg_match(): No ending delimiter '^' found in /home/lp889/public_html/ci527/assignment2/api.php on line 44
+[10-Mar-2025 13:40:37 UTC] PHP Warning:  Cannot modify header information - headers already sent by (output started at /home/lp889/public_html/ci527/assignment2/api.php:1) in /home/lp889/public_html/ci527/assignment2/api.php on line 47
+[10-Mar-2025 13:41:18 UTC] PHP Warning:  Cannot modify header information - headers already sent by (output started at /home/lp889/public_html/ci527/assignment2/api.php:1) in /home/lp889/public_html/ci527/assignment2/api.php on line 47
+[10-Mar-2025 14:27:13 UTC] PHP Warning:  Undefined variable $target in /home/lp889/public_html/ci527/assignment2/api.php on line 36
+[10-Mar-2025 14:27:13 UTC] PHP Deprecated:  preg_match(): Passing null to parameter #2 ($subject) of type string is deprecated in /home/lp889/public_html/ci527/assignment2/api.php on line 36
+[10-Mar-2025 14:27:13 UTC] PHP Warning:  Cannot modify header information - headers already sent by (output started at /home/lp889/public_html/ci527/assignment2/api.php:36) in /home/lp889/public_html/ci527/assignment2/api.php on line 42
+[10-Mar-2025 14:29:33 UTC] PHP Fatal error:  Uncaught Error: Undefined constant "STDIN" in /home/lp889/public_html/ci527/assignment2/api.php:9
+Stack trace:
+#0 {main}
+  thrown in /home/lp889/public_html/ci527/assignment2/api.php on line 9
+[10-Mar-2025 14:33:03 UTC] PHP Fatal error:  Uncaught Error: Call to undefined function request_parse_body() in /home/lp889/public_html/ci527/assignment2/api.php:11
+Stack trace:
+#0 {main}
+  thrown in /home/lp889/public_html/ci527/assignment2/api.php on line 11
+[10-Mar-2025 14:34:02 UTC] PHP Fatal error:  Uncaught Error: Cannot use object of type stdClass as array in /home/lp889/public_html/ci527/assignment2/api.php:13
+Stack trace:
+#0 {main}
+  thrown in /home/lp889/public_html/ci527/assignment2/api.php on line 13
+[10-Mar-2025 14:34:11 UTC] PHP Fatal error:  Uncaught Error: Object of type stdClass is not callable in /home/lp889/public_html/ci527/assignment2/api.php:13
+Stack trace:
+#0 {main}
+  thrown in /home/lp889/public_html/ci527/assignment2/api.php on line 13
+[10-Mar-2025 14:34:40 UTC] PHP Warning:  Attempt to read property "text" on string in /home/lp889/public_html/ci527/assignment2/api.php on line 13
+[10-Mar-2025 14:34:49 UTC] PHP Warning:  Attempt to read property "string" on string in /home/lp889/public_html/ci527/assignment2/api.php on line 13
+[10-Mar-2025 14:34:58 UTC] PHP Warning:  Undefined variable $source in /home/lp889/public_html/ci527/assignment2/api.php on line 13
+[10-Mar-2025 14:34:58 UTC] PHP Warning:  Undefined property: stdClass::$ in /home/lp889/public_html/ci527/assignment2/api.php on line 13
+[10-Mar-2025 14:35:54 UTC] PHP Warning:  Cannot modify header information - headers already sent by (output started at /home/lp889/public_html/ci527/assignment2/api.php:13) in /home/lp889/public_html/ci527/assignment2/api.php on line 48

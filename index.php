@@ -1,27 +1,26 @@
-<!-- Version 3 -->
-<?php
-    $year = date("Y");
-    $html = "<h1>Happy $year!</h1>"
-?>
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Index of examples</title>
 </head>
 <body>
-    <!-- Version 1 -->
-    <?php echo "Hello, World!"; ?>
-
-    <!-- Version 2 -->
-    <?php 
-        $year = date("Y");
-        echo "Hello $year";
+    <h2>Index of examples</h2>
+    <?php
+    // Get the working directory
+    $dir = opendir('.');
+    // read all of the files in the directory and assign them to $page one at a time
+    // check that it opened correctly
+    while(false !== ($page = readdir($dir))) {
+        // if the page is not '.', '..' or 'api.php'
+        if ($page != '.' && $page != '..' && $page != basename(__FILE__) && $page != '.git' && $page != '.gitignore') {
+            // create a link to each page
+            echo "<p><a href='./$page'>$page</a></p>";
+        }
+    }
+    // close the directory
+    closedir($dir);
     ?>
-            
-    <!-- Version 3 -->
-    <?php echo $html; ?>
 </body>
 </html>
