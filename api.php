@@ -21,21 +21,22 @@ class MyAPI {
 
         // otherwise, create table and commit
         $query = "CREATE TABLE IF NOT EXISTS users( 
-            id INT(11) NOT NULL AUTO_INCREMENT, 
-            username VARCHAR(16) NOT NULL, 
-            PRIMARY KEY (id)
+            id          INT(11)     NOT NULL AUTO_INCREMENT, 
+            username    VARCHAR(16) NOT NULL, 
+            PRIMARY     KEY(id)
         );";
         $conn->query($query);
         $conn->commit();
         
         $query = "CREATE TABLE IF NOT EXISTS messages( 
-            id INT(11) NOT NULL AUTO_INCREMENT, 
-            message VARCHAR(255) NOT NULL, 
-            source INT(11) NOT NULL, 
-            target INT(11) NOT NULL, 
-            PRIMARY KEY (id),
-            FOREIGN KEY (source) REFERENCES users(id),
-            FOREIGN KEY (target) REFERENCES users(id)
+            id      INT(11)         NOT NULL    AUTO_INCREMENT, 
+            message VARCHAR(255)    NOT NULL, 
+            date    DATETIME        NOT NULL,
+            source  INT(11)         NOT NULL, 
+            target  INT(11)         NOT NULL, 
+            PRIMARY KEY(id),
+            FOREIGN KEY(source)     REFERENCES  users(id),
+            FOREIGN KEY(target)     REFERENCES  users(id)
         );";
         $conn->query($query);
         
@@ -60,7 +61,7 @@ class MyAPI {
         $conn->query("INSERT INTO users (username) VALUES ('MP')");
         
         // Database rows begin from 1
-        $conn->query("INSERT INTO messages (message, source, target) VALUES('Hello, World!', 1, 2)");
+        $conn->query("INSERT INTO messages (message, date, source, target) VALUES('Hello, World!', '" . date('Y-m-d H:i:s', time()) . "', 1, 2)");
 
         $info = [200, $conn->insert_id];
         $conn->close();
@@ -88,7 +89,7 @@ class MyAPI {
         return 200;
     }
 
-    public function getUserMessages($userID) {
+    public function getMessagesFromUser($userID) {
         // Connect using server name, username and password
         $conn = new mysqli($this->logins->servername, $this->logins->username, $this->logins->password, $this->logins->database);
 
@@ -99,17 +100,68 @@ class MyAPI {
         }
         // echo "Connected successfully";
 
-        // fetch all messages from user with id $userID
-        $messages = $conn->query("SELECT * FROM messages WHERE source = " . $userID)->fetch_all();
-    
+        // fetch user id of user with usernames $fromID and $toID
+        $getFrom = $conn->query("SELECT id FROM users WHERE username = '" . $userID . "'")->fetch_assoc();
+        if ($getFrom == null) return [202, ""];
 
-        for ($i=0; $i < count($messages); $i++) { 
-            echo $messages[$i][1];
-        }
+        // Fetch messages from users with associated ids
+        $messages = $conn->query("SELECT * FROM messages WHERE source = " . $getFrom["id"])->fetch_all();
+    
+        $data = [200, $messages];
 
         $conn->close();
 
-        return 200;
+        return $data;
+    }
+
+    public function getMessagesToUser($userID) {
+        // Connect using server name, username and password
+        $conn = new mysqli($this->logins->servername, $this->logins->username, $this->logins->password, $this->logins->database);
+
+        // if connection fails, kill
+        if ($conn->connect_error) {
+            die("Connection failed: " . $conn->connect_error);
+            return 500;
+        }
+        // echo "Connected successfully";
+
+        // fetch user id of user with usernames $fromID and $toID
+        $getTo = $conn->query("SELECT id FROM users WHERE username = '" . $userID . "'")->fetch_assoc();
+        if ($getTo == null) return [202, ""];
+        // Fetch messages from users with associated ids
+        $messages = $conn->query("SELECT * FROM messages WHERE target = " . $getTo["id"])->fetch_all();
+    
+        $data = [200, $messages];
+
+        $conn->close();
+
+        return $data;
+    }
+
+    public function getMessagesFromUserToUser($fromID, $toID) {
+        // Connect using server name, username and password
+        $conn = new mysqli($this->logins->servername, $this->logins->username, $this->logins->password, $this->logins->database);
+
+        // if connection fails, kill
+        if ($conn->connect_error) {
+            die("Connection failed: " . $conn->connect_error);
+            return 500;
+        }
+        // echo "Connected successfully";
+
+        // fetch user id of user with usernames $fromID and $toID
+        $getFrom = $conn->query("SELECT id FROM users WHERE username = '" . $fromID . "'")->fetch_assoc();
+        $getTo = $conn->query("SELECT id FROM users WHERE username = '" . $toID . "'")->fetch_assoc();
+        if ($getTo == null || $getFrom == null) return [202, ""];
+
+        // Fetch messages from users with associated ids
+        $messages = $conn->query("SELECT * FROM messages WHERE source = " . $getFrom["id"] . " AND target = " . $getTo["id"])->fetch_all();
+
+        $data = [200, $messages];
+
+        $conn->close();
+
+        return $data;
     }
 
     public function dropTable() {
@@ -171,12 +223,72 @@ class MyAPI {
                 exit();
             case "GET":
                 // Check for information in body
-                parse_str(file_get_contents('php://input'), $data);
-                $data = (object)$data;
+                $data = (object)$_GET;
 
-                // use regex to validate the information and check
+                // regex for valid values
+                $exp = "/^[a-zA-Z0-9_]{1,16}+$/m";
 
-                echo "GET METHOD DONE";
+                // validate the data is present and filled
+                $source = property_exists($data, "source") ? (!empty($data->source) ? true : false) : false;
+                $target = property_exists($data, "target") ? (!empty($data->target) ? true : false) : false;
+
+                //if (!preg_match($exp, $data->source) || !preg_match($exp, $data->target)) {
+                //    http_response_code(400);
+                //    return;
+                //}
+
+                // Check which properties exist
+                if (!$source && !$target) {
+                    http_response_code(400);
+                    return;
+                } else if ($source && $target) {
+                    if (!preg_match($exp, $data->source) || !preg_match($exp, $data->target)) {
+                        http_response_code(400);
+                        return;
+                    }
+                    // Get sent from source to target
+                    $results = $this->getMessagesFromUserToUser($data->source, $data->target);
+                } else if ($source && !$target) {
+                    if (!preg_match($exp, $data->source)) {
+                        http_response_code(400);
+                        return;
+                    }
+                    // Get sent from source
+                    $results = $this->getMessagesFromUser($data->source);
+                } else if (!$source & $target) {
+                    if (!preg_match($exp, $data->target)) {
+                        http_response_code(400);
+                        return;
+                    }
+                    // Get sent to target
+                    $results = $this->getMessagesToUser($data->target);
+                } else {
+                    http_response_code(400);
+                }
+                
+                if ($results[0] != 200) {
+                    http_response_code($results[0]);
+                    return;
+                }
+
+                if (count($results[1]) == 0) {
+                    http_response_code(202);
+                    return;
+                }
+
+                $messages = '{"messages": [';
+
+                foreach ($results[1] as $key => $value) {
+                    $messages = $messages . '{"id":' .json_encode($value[0], JSON_PRETTY_PRINT) . ','
+                    . '"sent":' .json_encode($value[2], JSON_PRETTY_PRINT) . ','
+                    . '"source":' .json_encode($value[1], JSON_PRETTY_PRINT) . ','
+                    . '"target":' .json_encode($value[3], JSON_PRETTY_PRINT) . ','
+                    . '"message":' .json_encode($value[4], JSON_PRETTY_PRINT) . '},';
+                }
+
+                echo $messages . ']}';
+
+                // echo "GET METHOD DONE";
                 // Read all information requested and return in JSON
                 break;
             default:
