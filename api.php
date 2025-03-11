@@ -278,12 +278,16 @@ class MyAPI {
 
                 $messages = '{"messages": [';
 
-                foreach ($results[1] as $key => $value) {
-                    $messages = $messages . '{"id":' .json_encode($value[0], JSON_PRETTY_PRINT) . ','
-                    . '"sent":' .json_encode($value[2], JSON_PRETTY_PRINT) . ','
-                    . '"source":' .json_encode($value[1], JSON_PRETTY_PRINT) . ','
-                    . '"target":' .json_encode($value[3], JSON_PRETTY_PRINT) . ','
-                    . '"message":' .json_encode($value[4], JSON_PRETTY_PRINT) . '},';
+                // Fixes issue with trailing comma on last entry
+                for ($i=0; $i < count($results[1]); $i++) { 
+                    $messages = $messages . '{"id":' .json_encode($results[1][$i][0], JSON_PRETTY_PRINT) . ','
+                    . '"sent":' .json_encode($results[1][$i][2], JSON_PRETTY_PRINT) . ','
+                    . '"source":' .json_encode($results[1][$i][1], JSON_PRETTY_PRINT) . ','
+                    . '"target":' .json_encode($results[1][$i][3], JSON_PRETTY_PRINT) . ','
+                    . '"message":' .json_encode($results[1][$i][4], JSON_PRETTY_PRINT) . '}';
+                    if ($i != count($results[1])-1) {
+                        $messages = $messages . ",";
+                    }
                 }
 
                 echo $messages . ']}';
