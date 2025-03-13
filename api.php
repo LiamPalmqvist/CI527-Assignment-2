@@ -18,25 +18,14 @@ class MyAPI {
             return 500;
         }
         echo 'Connected successfully';
-
-        // otherwise, create table and commit
-        $query = 'CREATE TABLE IF NOT EXISTS users( 
-            id          INT(11)     NOT NULL AUTO_INCREMENT, 
-            username    VARCHAR(16) NOT NULL, 
-            PRIMARY     KEY(id)
-        );';
-        $conn->query($query);
-        $conn->commit();
         
         $query = 'CREATE TABLE IF NOT EXISTS messages( 
             id      INT(11)         NOT NULL    AUTO_INCREMENT, 
             message VARCHAR(255)    NOT NULL, 
             date    DATETIME        NOT NULL,
-            source  INT(11)         NOT NULL, 
-            target  INT(11)         NOT NULL, 
-            PRIMARY KEY(id),
-            FOREIGN KEY(source)     REFERENCES  users(id),
-            FOREIGN KEY(target)     REFERENCES  users(id)
+            source  VARCHAR(11)         NOT NULL, 
+            target  VARCHAR(11)     NOT NULL, 
+            PRIMARY KEY(id)
         );';
         $conn->query($query);
         
@@ -56,25 +45,8 @@ class MyAPI {
         }
         // echo 'Connected successfully';
 
-        $sourceID = $conn->query("SELECT * FROM users WHERE username = '$source'")->fetch_assoc();
-        $targetID = $conn->query("SELECT * FROM users WHERE username = '$target'")->fetch_assoc();
-    
-        if ($sourceID == null) {
-            $conn->query("INSERT INTO users (username) VALUES ('$source')");
-        }
-    
-        if ($targetID == null) {
-            $conn->query("INSERT INTO users (username) VALUES ('$target')");
-        }
-
-        $sourceID = $conn->query("SELECT * FROM users WHERE username = '$source'")->fetch_object()->id;
-        $targetID = $conn->query("SELECT * FROM users WHERE username = '$target'")->fetch_object()->id;
-        // // Add users to the database
-        // $conn->query('INSERT INTO users (username) VALUES ("LP")');
-        // $conn->query('INSERT INTO users (username) VALUES ("MP")');
-        
         // Database rows begin from 1
-        $conn->query("INSERT INTO messages (message, date, source, target) VALUES('$message', '" . date('Y-m-d H:i:s', time()) . "', $sourceID, $targetID)");
+        $conn->query("INSERT INTO messages (message, date, source, target) VALUES('$message', '" . date('Y-m-d H:i:s', time()) . "', '$source', '$target')");
 
         $info = [200, $conn->insert_id];
         $conn->close();
@@ -102,24 +74,24 @@ class MyAPI {
         return 200;
     }
 
-    public function getMessagesFromUser($userID) {
+    public function getMessagesFromUser($username) {
         // Connect using server name, username and password
         $conn = new mysqli($this->logins->servername, $this->logins->username, $this->logins->password, $this->logins->database);
 
         // if connection fails, kill
         if ($conn->connect_error) {
             die('Connection failed: ' . $conn->connect_error);
-            return 500;
+            return [500, ""];
         }
         // echo 'Connected successfully';
 
-        // fetch user id of user with usernames $fromID and $toID
-        $getFrom = $conn->query('SELECT id FROM users WHERE username = "' . $userID . '"')->fetch_assoc();
-        if ($getFrom == null) return [202, ''];
-
         // Fetch messages from users with associated ids
-        $messages = $conn->query('SELECT * FROM messages WHERE source = ' . $getFrom['id'])->fetch_all();
-    
+        $messages = $conn->query("SELECT * FROM messages WHERE source = '$username'")->fetch_all();
+        if ($messages == null) {
+            $conn->close();
+            return [204, ""];
+        }
+
         $data = [200, $messages];
 
         $conn->close();
@@ -127,23 +99,24 @@ class MyAPI {
         return $data;
     }
 
-    public function getMessagesToUser($userID) {
+    public function getMessagesToUser($username) {
         // Connect using server name, username and password
         $conn = new mysqli($this->logins->servername, $this->logins->username, $this->logins->password, $this->logins->database);
 
         // if connection fails, kill
         if ($conn->connect_error) {
             die('Connection failed: ' . $conn->connect_error);
-            return 500;
+            return [500, ""];
         }
         // echo 'Connected successfully';
 
-        // fetch user id of user with usernames $fromID and $toID
-        $getTo = $conn->query('SELECT id FROM users WHERE username = "' . $userID . '"')->fetch_assoc();
-        if ($getTo == null) return [202, ''];
         // Fetch messages from users with associated ids
-        $messages = $conn->query('SELECT * FROM messages WHERE target = ' . $getTo['id'])->fetch_all();
-    
+        $messages = $conn->query("SELECT * FROM messages WHERE target = '$username'")->fetch_all();
+        if ($messages == null) {
+            $conn->close();
+            return [204, ""];
+        }
+
         $data = [200, $messages];
 
         $conn->close();
@@ -151,25 +124,24 @@ class MyAPI {
         return $data;
     }
 
-    public function getMessagesFromUserToUser($fromID, $toID) {
+    public function getMessagesFromUserToUser($fromUsername, $toUsername) {
         // Connect using server name, username and password
         $conn = new mysqli($this->logins->servername, $this->logins->username, $this->logins->password, $this->logins->database);
 
         // if connection fails, kill
         if ($conn->connect_error) {
             die('Connection failed: ' . $conn->connect_error);
-            return 500;
+            return [500, ""];
         }
         // echo 'Connected successfully';
 
-        // fetch user id of user with usernames $fromID and $toID
-        $getFrom = $conn->query('SELECT id FROM users WHERE username = "' . $fromID . '"')->fetch_assoc();
-        $getTo = $conn->query('SELECT id FROM users WHERE username = "' . $toID . '"')->fetch_assoc();
-        if ($getTo == null || $getFrom == null) return [202, ''];
-
         // Fetch messages from users with associated ids
-        $messages = $conn->query('SELECT * FROM messages WHERE source = ' . $getFrom['id'] . ' AND target = ' . $getTo['id'])->fetch_all();
+        $messages = $conn->query("SELECT * FROM messages WHERE source = '$fromUsername' AND target = '$toUsername'")->fetch_all();
 
+        if ($messages == null) {
+            $conn->close();
+            return [204, ""];
+        }
         $data = [200, $messages];
 
         $conn->close();
