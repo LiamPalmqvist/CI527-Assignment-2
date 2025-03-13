@@ -45,7 +45,7 @@ class MyAPI {
         return 200;
     }
 
-    public function insertToTable() {
+    public function insertToTable($source, $target, $message) {
         // Connect using server name, username and password
         $conn = new mysqli($this->logins->servername, $this->logins->username, $this->logins->password, $this->logins->database);
 
@@ -56,12 +56,25 @@ class MyAPI {
         }
         // echo 'Connected successfully';
 
-        // Add users to the database
-        $conn->query('INSERT INTO users (username) VALUES ("LP")');
-        $conn->query('INSERT INTO users (username) VALUES ("MP")');
+        $sourceID = $conn->query("SELECT * FROM users WHERE username = '$source'")->fetch_assoc();
+        $targetID = $conn->query("SELECT * FROM users WHERE username = '$target'")->fetch_assoc();
+    
+        if ($sourceID == null) {
+            $conn->query("INSERT INTO users (username) VALUES ('$source')");
+        }
+    
+        if ($targetID == null) {
+            $conn->query("INSERT INTO users (username) VALUES ('$target')");
+        }
+
+        $sourceID = $conn->query("SELECT * FROM users WHERE username = '$source'")->fetch_object()->id;
+        $targetID = $conn->query("SELECT * FROM users WHERE username = '$target'")->fetch_object()->id;
+        // // Add users to the database
+        // $conn->query('INSERT INTO users (username) VALUES ("LP")');
+        // $conn->query('INSERT INTO users (username) VALUES ("MP")');
         
         // Database rows begin from 1
-        $conn->query('INSERT INTO messages (message, date, source, target) VALUES("Hello, World!", "' . date('Y-m-d H:i:s', time()) . '", 1, 2)');
+        $conn->query("INSERT INTO messages (message, date, source, target) VALUES('$message', '" . date('Y-m-d H:i:s', time()) . "', $sourceID, $targetID)");
 
         $info = [200, $conn->insert_id];
         $conn->close();
@@ -208,7 +221,7 @@ class MyAPI {
                 if (!$valid) {
                     http_response_code(400);
                 } else {
-                    $httpCode = $this->insertToTable();
+                    $httpCode = $this->insertToTable($data->source, $data->target, $data->message);
     
                     // depending on the validity, respond with a HTTP code
                     http_response_code($httpCode[0]);
@@ -229,15 +242,9 @@ class MyAPI {
                 $exp = '/^[a-zA-Z0-9_]{4,16}+$/m';
 
                 // validate the data is present and filled
-                //$source = property_exists($data, 'source') ? (!empty($data->source) ? true : false) : false;
-                //$target = property_exists($data, 'target') ? (!empty($data->target) ? true : false) : false;
-                $source = isset($data->source);
-                $target = isset($data->target);
-
-                //if (!preg_match($exp, $data->source) || !preg_match($exp, $data->target)) {
-                //    http_response_code(400);
-                //    return;
-                //}
+                $source = property_exists($data, 'source') ? (!empty($data->source) ? true : false) : false;
+                $target = property_exists($data, 'target') ? (!empty($data->target) ? true : false) : false;
+                
 
                 // Check which properties exist
                 if (!$source && !$target) {
@@ -274,7 +281,7 @@ class MyAPI {
                 }
 
                 if (count($results[1]) == 0) {
-                    http_response_code(202);
+                    http_response_code(204);
                     return;
                 }
 
@@ -293,9 +300,6 @@ class MyAPI {
                 }
 
                 echo $messages . ']}';
-
-                // echo 'GET METHOD DONE';
-                // Read all information requested and return in JSON
                 break;
             default:
                 break;
