@@ -23,7 +23,7 @@ class MyAPI {
             id      INT(11)         NOT NULL    AUTO_INCREMENT, 
             message VARCHAR(255)    NOT NULL, 
             date    DATETIME        NOT NULL,
-            source  VARCHAR(11)         NOT NULL, 
+            source  VARCHAR(11)     NOT NULL, 
             target  VARCHAR(11)     NOT NULL, 
             PRIMARY KEY(id)
         );';
