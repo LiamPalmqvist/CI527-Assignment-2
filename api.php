@@ -48,7 +48,7 @@ class MyAPI {
         // Database rows begin from 1
         $conn->query("INSERT INTO messages (message, date, source, target) VALUES('$message', '" . date('Y-m-d H:i:s', time()) . "', '$source', '$target')");
 
-        $info = [200, $conn->insert_id];
+        $info = [201, $conn->insert_id];
         $conn->close();
         return $info;
     }
@@ -182,8 +182,10 @@ class MyAPI {
                 // Check if all required information exists
                 if (!property_exists($data, 'source') || !property_exists($data, 'target') || !property_exists($data, 'message')) {
                     http_response_code(400);
+                    exit();
                 } else if (strlen((string)$data->source) <= 0 || strlen((string)$data->target) <= 0 || strlen((string)$data->message) <= 0) {
                     http_response_code(400);
+                    exit();
                 }
                 // REGEX denoting alphanumeric or '_' with length between 4 and 16 (inclusive)
                 $exp = '/^[a-zA-Z0-9_]{4,16}+$/m';
@@ -192,6 +194,7 @@ class MyAPI {
                 $valid = boolval(preg_match($exp, $data->target) && preg_match($exp, $data->source));
                 if (!$valid) {
                     http_response_code(400);
+                    exit();
                 } else {
                     $httpCode = $this->insertToTable($data->source, $data->target, $data->message);
     
@@ -202,7 +205,7 @@ class MyAPI {
                     header('Content-type: application/json; charset=UTF-8');
                     
                     // This is what sends the JSON back
-                    echo $httpCode[0] == 200 ? '{"id":'.json_encode($httpCode[1], JSON_PRETTY_PRINT).'}' : '';    
+                    echo $httpCode[0] == 201 ? '{"id":'.json_encode($httpCode[1], JSON_PRETTY_PRINT).'}' : '';    
                 }
                 // exit to stop anything more from being sent
                 exit();

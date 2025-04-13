@@ -1,0 +1,29 @@
+### Get all messages from Liam (200, exists)
+GET https://lp889.brighton.domains/ci527/assignment2/api.php?source=Liam HTTP/1.1
+
+### Get all messages to Liam (200, exists)
+GET https://lp889.brighton.domains/ci527/assignment2/api.php?target=Liam HTTP/1.1
+
+### Get all messages from David to Liam (200, exists)
+GET https://lp889.brighton.domains/ci527/assignment2/api.php?target=Liam&source=David HTTP/1.1
+
+### Send a message from Liam to David that says "Hello!" (201, created)
+POST https://lp889.brighton.domains/ci527/assignment2/api.php
+Content-Type: application/x-www-form-urlencoded
+
+source=Liam&target=David&message=Hello%20
+
+### Send a message from David to James that says "Hello!" (201, created)
+POST https://lp889.brighton.domains/ci527/assignment2/api.php
+Content-Type: application/x-www-form-urlencoded
+
+source=David&target=James&message=Hello%20
+
+### Get all messages James has sent (Error 204, exists but no content)
+GET https://lp889.brighton.domains/ci527/assignment2/api.php?source=James
+
+### Send an incomplete message from James to Liam (400, nothing returned)
+POST https://lp889.brighton.domains/ci527/assignment2/api.php
+Content-Type: application/x-www-form-urlencoded
+
+source=James&target=Liam

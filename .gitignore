@@ -3,3 +3,8 @@ passwords
 error_log
 .vscode
 *.sql
+.gitignore
+index.php
+json.php
+example1.php
+example2.php
